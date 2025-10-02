@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 
 const Register = () => {
@@ -12,6 +12,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChange = (e) => {
     setFormData({
@@ -46,13 +47,15 @@ const Register = () => {
       localStorage.setItem('user', JSON.stringify({
         id: response.data._id,
         name: response.data.name,
-        email: response.data.email
+        email: response.data.email,
+        role: response.data.role
       }));
 
       console.log('Registration successful:', response.data);
       
-      // Redirect to home page
-      navigate('/');
+      // Get the redirect path from location state or default to home
+      const from = location.state?.from || '/';
+      navigate(from, { replace: true });
     } catch (err) {
       console.error('Registration error:', err);
       setError(err.response?.data?.message || 'Registration failed. Please try again.');

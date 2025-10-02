@@ -10,51 +10,65 @@ const getProducts = async (req, res, next) => {
       search,
       category,
       size,
-      priceMin,
-      priceMax,
+      'price[gte]': priceGte,
+      'price[lte]': priceLte,
       page = 1,
       limit = 10,
       sort = 'createdAt:desc'
     } = req.query;
 
-    // Build filter object
-    let filter = {};
+    // Build filter object using $and for better query performance
+    const filterConditions = [];
 
     // Search filter (name or description) - case insensitive
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
-      ];
+    if (search && search.trim()) {
+      filterConditions.push({
+        $or: [
+          { name: { $regex: search.trim(), $options: 'i' } },
+          { description: { $regex: search.trim(), $options: 'i' } }
+        ]
+      });
     }
 
     // Category filter
     if (category && ['Men', 'Women', 'Kids'].includes(category)) {
-      filter.category = category;
+      filterConditions.push({ category });
     }
 
     // Size filter - check if product's sizes array includes the requested size
     if (size && ['S', 'M', 'L', 'XL'].includes(size)) {
-      filter.sizes = size;
+      filterConditions.push({ sizes: size });
     }
 
-    // Price range filter
-    const priceMinNum = priceMin ? Number(priceMin) : null;
-    const priceMaxNum = priceMax ? Number(priceMax) : null;
+    // Price range filter with bracket syntax
+    const priceGteNum = priceGte ? Number(priceGte) : null;
+    const priceLteNum = priceLte ? Number(priceLte) : null;
     
-    if (priceMinNum !== null || priceMaxNum !== null) {
-      filter.price = {};
-      if (priceMinNum !== null && priceMinNum >= 0) {
-        filter.price.$gte = priceMinNum;
+    if (priceGteNum !== null || priceLteNum !== null) {
+      const priceFilter = {};
+      if (priceGteNum !== null && !isNaN(priceGteNum) && priceGteNum >= 0) {
+        priceFilter.$gte = priceGteNum;
       }
-      if (priceMaxNum !== null && priceMaxNum >= 0) {
-        filter.price.$lte = priceMaxNum;
+      if (priceLteNum !== null && !isNaN(priceLteNum) && priceLteNum >= 0) {
+        priceFilter.$lte = priceLteNum;
       }
+      
       // Validate price range
-      if (priceMinNum !== null && priceMaxNum !== null && priceMinNum > priceMaxNum) {
-        return res.status(400).json({ message: 'priceMin cannot be greater than priceMax' });
+      if (priceGteNum !== null && priceLteNum !== null && 
+          !isNaN(priceGteNum) && !isNaN(priceLteNum) && 
+          priceGteNum > priceLteNum) {
+        return res.status(400).json({ 
+          message: 'price[gte] cannot be greater than price[lte]' 
+        });
+      }
+      
+      if (Object.keys(priceFilter).length > 0) {
+        filterConditions.push({ price: priceFilter });
       }
     }
+
+    // Build final filter
+    const filter = filterConditions.length > 0 ? { $and: filterConditions } : {};
 
     // Pagination
     const pageNum = Math.max(1, Number(page) || 1);
@@ -63,7 +77,7 @@ const getProducts = async (req, res, next) => {
 
     // Sorting
     let sortObj = { createdAt: -1 }; // default sort
-    if (sort) {
+    if (sort && typeof sort === 'string') {
       const [sortField, sortDirection] = sort.split(':');
       const allowedFields = ['price', 'name', 'createdAt'];
       const direction = sortDirection === 'asc' ? 1 : -1;
@@ -118,7 +132,165 @@ const getProductById = async (req, res, next) => {
   }
 };
 
+// @desc    Create new product
+// @route   POST /api/products
+// @access  Private (Admin)
+const createProduct = async (req, res, next) => {
+  try {
+    const { name, description, price, imageUrl, category, sizes } = req.body;
+
+    // Validate required fields
+    if (!name || !price || !category) {
+      return res.status(400).json({ 
+        message: 'Name, price, and category are required' 
+      });
+    }
+
+    // Validate category
+    if (!['Men', 'Women', 'Kids'].includes(category)) {
+      return res.status(400).json({ 
+        message: 'Category must be one of: Men, Women, Kids' 
+      });
+    }
+
+    // Validate price
+    const priceNum = Number(price);
+    if (isNaN(priceNum) || priceNum < 0) {
+      return res.status(400).json({ 
+        message: 'Price must be a valid positive number' 
+      });
+    }
+
+    // Validate sizes
+    const validSizes = ['S', 'M', 'L', 'XL'];
+    if (sizes && !Array.isArray(sizes)) {
+      return res.status(400).json({ 
+        message: 'Sizes must be an array' 
+      });
+    }
+
+    if (sizes && sizes.some(size => !validSizes.includes(size))) {
+      return res.status(400).json({ 
+        message: `Invalid sizes. Must be one or more of: ${validSizes.join(', ')}` 
+      });
+    }
+
+    // Create product
+    const product = await Product.create({
+      name: name.trim(),
+      description: description?.trim() || '',
+      price: priceNum,
+      imageUrl: imageUrl?.trim() || '',
+      category,
+      sizes: sizes || validSizes
+    });
+
+    res.status(201).json(product);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update product
+// @route   PUT /api/products/:id
+// @access  Private (Admin)
+const updateProduct = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, description, price, imageUrl, category, sizes } = req.body;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid product ID' });
+    }
+
+    // Find product
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Validate category if provided
+    if (category && !['Men', 'Women', 'Kids'].includes(category)) {
+      return res.status(400).json({ 
+        message: 'Category must be one of: Men, Women, Kids' 
+      });
+    }
+
+    // Validate price if provided
+    if (price !== undefined) {
+      const priceNum = Number(price);
+      if (isNaN(priceNum) || priceNum < 0) {
+        return res.status(400).json({ 
+          message: 'Price must be a valid positive number' 
+        });
+      }
+    }
+
+    // Validate sizes if provided
+    if (sizes !== undefined) {
+      const validSizes = ['S', 'M', 'L', 'XL'];
+      if (!Array.isArray(sizes)) {
+        return res.status(400).json({ 
+          message: 'Sizes must be an array' 
+        });
+      }
+
+      if (sizes.some(size => !validSizes.includes(size))) {
+        return res.status(400).json({ 
+          message: `Invalid sizes. Must be one or more of: ${validSizes.join(', ')}` 
+        });
+      }
+    }
+
+    // Update product
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        ...(name && { name: name.trim() }),
+        ...(description !== undefined && { description: description.trim() }),
+        ...(price !== undefined && { price: Number(price) }),
+        ...(imageUrl !== undefined && { imageUrl: imageUrl.trim() }),
+        ...(category && { category }),
+        ...(sizes && { sizes })
+      },
+      { new: true, runValidators: true }
+    );
+
+    res.json(updatedProduct);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Delete product
+// @route   DELETE /api/products/:id
+// @access  Private (Admin)
+const deleteProduct = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid product ID' });
+    }
+
+    // Find and delete product
+    const product = await Product.findByIdAndDelete(id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json({ message: 'Product deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
 };

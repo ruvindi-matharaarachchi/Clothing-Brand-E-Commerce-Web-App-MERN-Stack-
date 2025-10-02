@@ -50,12 +50,12 @@ export const productService = {
     }
   },
 
-  // Get products with price range
+  // Get products with price range (bracket syntax)
   getProductsByPriceRange: async (minPrice, maxPrice, filters = {}) => {
     try {
       const params = {
-        priceMin: minPrice,
-        priceMax: maxPrice,
+        'price[gte]': minPrice,
+        'price[lte]': maxPrice,
         ...filters
       };
       const response = await api.get('/api/products', { params });

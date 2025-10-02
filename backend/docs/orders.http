@@ -1,0 +1,133 @@
+### Orders API Documentation
+
+# Variables
+@baseUrl = http://localhost:5000/api
+@token = your_jwt_token_here
+
+### 1. Create Order (Checkout)
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+
+### Expected 201 Response
+{
+  "orderId": "66fd7c0e3a2b6c1ab4a12345",
+  "orderDate": "2025-10-02T08:30:00.123Z",
+  "totalPrice": 8997,
+  "items": [
+    {
+      "product": "66fd7c0e3a2b6c1ab4a12346",
+      "name": "Men T-Shirt",
+      "imageUrl": "http://localhost:5000/uploads/images/product-123.jpg",
+      "size": "M",
+      "quantity": 2,
+      "price": 1999,
+      "lineTotal": 3998
+    },
+    {
+      "product": "66fd7c0e3a2b6c1ab4a12347",
+      "name": "Women Hoodie",
+      "imageUrl": "http://localhost:5000/uploads/images/product-124.jpg",
+      "size": "L",
+      "quantity": 1,
+      "price": 4999,
+      "lineTotal": 4999
+    }
+  ]
+}
+
+### 2. Get My Orders (Paginated)
+GET {{baseUrl}}/orders?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Expected 200 Response
+{
+  "data": [
+    {
+      "_id": "66fd7c0e3a2b6c1ab4a12345",
+      "user": "66fd7c0e3a2b6c1ab4a12340",
+      "items": [
+        {
+          "_id": "66fd7c0e3a2b6c1ab4a12348",
+          "product": {
+            "_id": "66fd7c0e3a2b6c1ab4a12346",
+            "name": "Men T-Shirt",
+            "imageUrl": "http://localhost:5000/uploads/images/product-123.jpg",
+            "price": 1999
+          },
+          "size": "M",
+          "quantity": 2,
+          "price": 1999
+        }
+      ],
+      "totalPrice": 8997,
+      "orderDate": "2025-10-02T08:30:00.123Z",
+      "createdAt": "2025-10-02T08:30:00.123Z",
+      "updatedAt": "2025-10-02T08:30:00.123Z"
+    }
+  ],
+  "page": 1,
+  "pages": 1,
+  "total": 1,
+  "limit": 10,
+  "hasPrev": false,
+  "hasNext": false
+}
+
+### 3. Get My Orders (Page 2)
+GET {{baseUrl}}/orders?page=2&limit=5
+Authorization: Bearer {{token}}
+
+### 4. Create Order with Empty Cart
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+
+### Expected 400 Response
+{
+  "message": "Cart is empty"
+}
+
+### 5. Create Order Without Authentication
+POST {{baseUrl}}/orders
+
+### Expected 401 Response
+{
+  "message": "Not authorized, token failed"
+}
+
+### 6. Get Orders Without Authentication
+GET {{baseUrl}}/orders
+
+### Expected 401 Response
+{
+  "message": "Not authorized, token failed"
+}
+
+### 7. Get Orders with Invalid Page
+GET {{baseUrl}}/orders?page=0&limit=10
+Authorization: Bearer {{token}}
+
+### Expected 200 Response (page defaults to 1)
+{
+  "data": [...],
+  "page": 1,
+  "pages": 1,
+  "total": 1,
+  "limit": 10,
+  "hasPrev": false,
+  "hasNext": false
+}
+
+### 8. Get Orders with Large Limit
+GET {{baseUrl}}/orders?page=1&limit=100
+Authorization: Bearer {{token}}
+
+### Expected 200 Response (limit capped at 50)
+{
+  "data": [...],
+  "page": 1,
+  "pages": 1,
+  "total": 1,
+  "limit": 50,
+  "hasPrev": false,
+  "hasNext": false
+}

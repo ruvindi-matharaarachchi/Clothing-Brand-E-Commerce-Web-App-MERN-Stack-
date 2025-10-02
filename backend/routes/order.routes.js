@@ -12,9 +12,9 @@ router.use(protect);
 // @access  Private
 router.post('/', createOrder);
 
-// @route   GET /api/orders/my
+// @route   GET /api/orders
 // @desc    Get user's orders
 // @access  Private
-router.get('/my', getMyOrders);
+router.get('/', getMyOrders);
 
 module.exports = router;

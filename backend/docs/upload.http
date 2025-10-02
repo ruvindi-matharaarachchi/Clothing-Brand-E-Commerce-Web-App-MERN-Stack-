@@ -1,0 +1,77 @@
+### Image Upload API Documentation
+
+# Variables
+@baseUrl = http://localhost:5000/api
+@token = your_jwt_token_here
+
+### 1. Upload Product Image
+POST {{baseUrl}}/upload/image
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+# Note: This is a multipart/form-data request
+# Use a tool like Postman or curl to test this endpoint
+# Form field name: "image"
+# File: select an image file
+
+### 2. Get All Uploaded Images
+GET {{baseUrl}}/upload/images
+Authorization: Bearer {{token}}
+
+### 3. Delete Image
+DELETE {{baseUrl}}/upload/image/product-1234567890-123456789.jpg
+Authorization: Bearer {{token}}
+
+### 4. Upload Image with cURL (Example)
+# curl -X POST \
+#   -H "Authorization: Bearer {{token}}" \
+#   -F "image=@/path/to/your/image.jpg" \
+#   {{baseUrl}}/upload/image
+
+### 5. Upload Image with JavaScript (Example)
+# const formData = new FormData();
+# formData.append('image', file);
+# 
+# fetch('{{baseUrl}}/upload/image', {
+#   method: 'POST',
+#   headers: {
+#     'Authorization': `Bearer ${token}`
+#   },
+#   body: formData
+# });
+
+### Error Examples
+
+### 6. Upload Non-Image File
+POST {{baseUrl}}/upload/image
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+# Form field name: "image"
+# File: select a text file or other non-image file
+
+### 7. Upload File Too Large
+POST {{baseUrl}}/upload/image
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+# Form field name: "image"
+# File: select an image file larger than 5MB
+
+### 8. Upload Without Authentication
+POST {{baseUrl}}/upload/image
+Content-Type: multipart/form-data
+
+# Form field name: "image"
+# File: select an image file
+
+### 9. Delete Non-existent Image
+DELETE {{baseUrl}}/upload/image/non-existent-file.jpg
+Authorization: Bearer {{token}}
+
+### 10. Upload Without File
+POST {{baseUrl}}/upload/image
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+# No file attached

@@ -21,8 +21,8 @@ const ProductList = () => {
     search: '',
     category: '',
     size: '',
-    priceMin: '',
-    priceMax: '',
+    priceGte: '',
+    priceLte: '',
     sort: 'createdAt:desc'
   });
 

@@ -1,0 +1,141 @@
+### Cart Management API Documentation
+### Base URL: http://localhost:5000/api
+### All cart endpoints require JWT authentication
+
+### 1. Get User's Cart
+GET http://localhost:5000/api/cart
+Authorization: Bearer <your-jwt-token>
+
+### 2. Add Item to Cart
+POST http://localhost:5000/api/cart
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+{
+  "productId": "66f9a7f0f1c2b8b3f9e12345",
+  "size": "M",
+  "quantity": 2
+}
+
+### 3. Update Item Quantity
+PUT http://localhost:5000/api/cart/66f9a7f0f1c2b8b3f9e12346
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+{
+  "quantity": 3
+}
+
+### 4. Update Item Size
+PUT http://localhost:5000/api/cart/66f9a7f0f1c2b8b3f9e12346
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+{
+  "size": "L"
+}
+
+### 5. Update Both Quantity and Size
+PUT http://localhost:5000/api/cart/66f9a7f0f1c2b8b3f9e12346
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+{
+  "quantity": 1,
+  "size": "XL"
+}
+
+### 6. Remove Item from Cart
+DELETE http://localhost:5000/api/cart/66f9a7f0f1c2b8b3f9e12346
+Authorization: Bearer <your-jwt-token>
+
+### 7. Test Invalid Item ID (should return 400)
+PUT http://localhost:5000/api/cart/invalid-id
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+{
+  "quantity": 2
+}
+
+### 8. Test Non-existent Item ID (should return 404)
+DELETE http://localhost:5000/api/cart/507f1f77bcf86cd799439011
+Authorization: Bearer <your-jwt-token>
+
+### 9. Test Invalid Size (should return 400)
+POST http://localhost:5000/api/cart
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+{
+  "productId": "66f9a7f0f1c2b8b3f9e12345",
+  "size": "XXL",
+  "quantity": 1
+}
+
+### 10. Test Invalid Quantity (should return 400)
+POST http://localhost:5000/api/cart
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+{
+  "productId": "66f9a7f0f1c2b8b3f9e12345",
+  "size": "M",
+  "quantity": 0
+}
+
+### 11. Test Missing Required Fields (should return 400)
+POST http://localhost:5000/api/cart
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+{
+  "productId": "66f9a7f0f1c2b8b3f9e12345"
+}
+
+### 12. Test Unauthorized Access (should return 401)
+GET http://localhost:5000/api/cart
+
+### Request/Response Examples:
+
+### Add Item Request:
+# POST /api/cart
+# {
+#   "productId": "66f9a7f0f1c2b8b3f9e12345",
+#   "size": "M",
+#   "quantity": 2
+# }
+
+### Cart Response Format:
+# {
+#   "items": [
+#     {
+#       "id": "66f9a7f0f1c2b8b3f9e12346",
+#       "product": "66f9a7f0f1c2b8b3f9e12345",
+#       "name": "Classic White T-Shirt",
+#       "imageUrl": "https://via.placeholder.com/300x300?text=White+T-Shirt",
+#       "size": "M",
+#       "quantity": 2,
+#       "price": 29.99,
+#       "lineTotal": 59.98
+#     }
+#   ],
+#   "itemCount": 2,
+#   "subtotal": 59.98,
+#   "updatedAt": "2024-01-15T10:30:00.000Z"
+# }
+
+### Error Response Format:
+# {
+#   "success": false,
+#   "error": "Error message",
+#   "message": "Detailed error message"
+# }
+
+### Notes:
+- All cart operations require valid JWT token in Authorization header
+- Product prices are snapshotted when added to cart
+- Adding same product+size combination increments quantity
+- Cart is automatically created for new users
+- Only one cart per user (enforced by unique index)
+- Item IDs are MongoDB ObjectIds of cart items, not products

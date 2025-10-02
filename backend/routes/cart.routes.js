@@ -18,7 +18,7 @@ router.get('/', getCart);
 router.post('/', addItem);
 
 // @route   PUT /api/cart/:itemId
-// @desc    Update cart item
+// @desc    Update cart item (quantity or size)
 // @access  Private
 router.put('/:itemId', updateItem);
 

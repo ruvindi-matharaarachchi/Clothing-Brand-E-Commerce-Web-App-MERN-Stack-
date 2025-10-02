@@ -15,13 +15,20 @@ const ProductFilters = ({ filters, onFiltersChange, onSearch, loading }) => {
     });
   };
 
+  const handlePriceChange = (priceType, value) => {
+    onFiltersChange({
+      ...filters,
+      [`price${priceType}`]: value
+    });
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     onFiltersChange({
       category: '',
       size: '',
-      priceMin: '',
-      priceMax: '',
+      priceGte: '',
+      priceLte: '',
       sort: 'createdAt:desc'
     });
   };
@@ -144,8 +151,8 @@ const ProductFilters = ({ filters, onFiltersChange, onSearch, loading }) => {
           <input
             type="number"
             placeholder="Min price"
-            value={filters.priceMin || ''}
-            onChange={(e) => handleFilterChange('priceMin', e.target.value)}
+            value={filters.priceGte || ''}
+            onChange={(e) => handlePriceChange('Gte', e.target.value)}
             min="0"
             style={{
               width: '100%',
@@ -169,8 +176,8 @@ const ProductFilters = ({ filters, onFiltersChange, onSearch, loading }) => {
           <input
             type="number"
             placeholder="Max price"
-            value={filters.priceMax || ''}
-            onChange={(e) => handleFilterChange('priceMax', e.target.value)}
+            value={filters.priceLte || ''}
+            onChange={(e) => handlePriceChange('Lte', e.target.value)}
             min="0"
             style={{
               width: '100%',

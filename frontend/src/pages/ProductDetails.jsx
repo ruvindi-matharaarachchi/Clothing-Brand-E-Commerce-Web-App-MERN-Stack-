@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import productService from '../api/productService';
+import { useCart } from '../context/CartContext';
+import { useNotifications } from '../context/NotificationContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const { addItem } = useCart();
+  const { addNotification } = useNotifications();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [addToCartMessage, setAddToCartMessage] = useState('');
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -32,13 +38,46 @@ const ProductDetails = () => {
     }
   }, [id]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!selectedSize) {
-      alert('Please select a size');
+      setAddToCartMessage('Please select a size');
       return;
     }
-    // TODO: Implement add to cart functionality
-    alert(`Added ${quantity} x ${product.name} (Size: ${selectedSize}) to cart`);
+
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setAddToCartMessage('Please log in to add items to cart');
+      setTimeout(() => setAddToCartMessage(''), 3000);
+      return;
+    }
+
+    try {
+      setAddingToCart(true);
+      setAddToCartMessage('');
+      
+      await addItem(product._id, selectedSize, quantity);
+      setAddToCartMessage(`Added ${quantity} x ${product.name} (Size: ${selectedSize}) to cart!`);
+      
+      // Show success notification
+      addNotification({
+        type: 'success',
+        message: `Added ${quantity} x ${product.name} (Size: ${selectedSize}) to cart!`,
+        duration: 3000
+      });
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setAddToCartMessage(''), 3000);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      if (error.response?.status === 401) {
+        setAddToCartMessage('Please log in to add items to cart');
+      } else {
+        setAddToCartMessage(error.response?.data?.message || 'Failed to add item to cart');
+      }
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
   if (loading) {
@@ -239,24 +278,65 @@ const ProductDetails = () => {
             </div>
           </div>
 
+          {/* Add to Cart Message */}
+          {addToCartMessage && (
+            <div style={{
+              padding: '12px',
+              borderRadius: '4px',
+              marginBottom: '16px',
+              backgroundColor: addToCartMessage.includes('Added') ? '#d4edda' : '#f8d7da',
+              color: addToCartMessage.includes('Added') ? '#155724' : '#721c24',
+              border: `1px solid ${addToCartMessage.includes('Added') ? '#c3e6cb' : '#f5c6cb'}`,
+              fontSize: '14px'
+            }}>
+              {addToCartMessage}
+            </div>
+          )}
+
           {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
+            disabled={addingToCart}
             style={{
               width: '100%',
               padding: '16px',
-              backgroundColor: '#007bff',
+              backgroundColor: addingToCart ? '#6c757d' : '#007bff',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
               fontSize: '18px',
               fontWeight: 'bold',
-              cursor: 'pointer',
-              marginBottom: '16px'
+              cursor: addingToCart ? 'not-allowed' : 'pointer',
+              marginBottom: '16px',
+              opacity: addingToCart ? 0.6 : 1
             }}
           >
-            Add to Cart
+            {addingToCart ? 'Adding to Cart...' : 'Add to Cart'}
           </button>
+
+          {/* Login Prompt */}
+          {!localStorage.getItem('token') && (
+            <div style={{
+              backgroundColor: '#fff3cd',
+              color: '#856404',
+              padding: '12px',
+              borderRadius: '4px',
+              marginBottom: '16px',
+              border: '1px solid #ffeaa7',
+              textAlign: 'center'
+            }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
+                <strong>Want to add this to your cart?</strong>
+              </p>
+              <Link to="/login" style={{
+                color: '#007bff',
+                textDecoration: 'none',
+                fontWeight: 'bold'
+              }}>
+                Login to continue shopping
+              </Link>
+            </div>
+          )}
 
           {/* Product Details */}
           <div style={{

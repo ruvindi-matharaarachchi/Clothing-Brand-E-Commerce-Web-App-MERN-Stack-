@@ -6,24 +6,31 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "seed:products": "node ./seeds/seedProducts.js"
+    "seed:products": "node ./seeds/seedProducts.js",
+    "create:admin": "node ./scripts/createAdmin.js"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^8.0.3",
     "bcrypt": "^5.1.1",
-    "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5",
-    "nodemailer": "^6.9.7",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "multer": "^2.0.2",
+    "nodemailer": "^6.9.7"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
   },
-  "keywords": ["ecommerce", "mern", "clothing", "api"],
+  "keywords": [
+    "ecommerce",
+    "mern",
+    "clothing",
+    "api"
+  ],
   "author": "",
   "license": "ISC"
 }

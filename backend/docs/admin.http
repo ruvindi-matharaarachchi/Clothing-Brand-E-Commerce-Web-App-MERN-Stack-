@@ -1,0 +1,139 @@
+### Admin Product Management API Documentation
+
+# Variables
+@baseUrl = http://localhost:5000/api
+@token = your_jwt_token_here
+
+### 1. Create New Product
+POST {{baseUrl}}/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Premium Cotton T-Shirt",
+  "description": "High-quality 100% cotton t-shirt with modern fit",
+  "price": 39.99,
+  "imageUrl": "https://via.placeholder.com/300x300?text=Premium+T-Shirt",
+  "category": "Men",
+  "sizes": ["S", "M", "L", "XL"]
+}
+
+### 2. Update Product
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Premium Cotton T-Shirt",
+  "price": 44.99,
+  "sizes": ["M", "L", "XL"]
+}
+
+### 3. Delete Product
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{token}}
+
+### 4. Get All Products (Admin View)
+GET {{baseUrl}}/products?limit=50&page=1
+Authorization: Bearer {{token}}
+
+### 5. Get Single Product
+GET {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{token}}
+
+### 6. Create Product with Minimal Data
+POST {{baseUrl}}/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Basic T-Shirt",
+  "price": 19.99,
+  "category": "Women"
+}
+
+### 7. Update Product Price Only
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "price": 24.99
+}
+
+### 8. Update Product Sizes Only
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "sizes": ["S", "M", "L"]
+}
+
+### 9. Create Kids Product
+POST {{baseUrl}}/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Kids Fun T-Shirt",
+  "description": "Colorful and comfortable t-shirt for kids",
+  "price": 15.99,
+  "imageUrl": "https://via.placeholder.com/300x300?text=Kids+T-Shirt",
+  "category": "Kids",
+  "sizes": ["S", "M", "L"]
+}
+
+### 10. Update Product Category
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "category": "Women"
+}
+
+### Error Examples
+
+### 11. Create Product with Invalid Data
+POST {{baseUrl}}/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "price": -10,
+  "category": "Invalid"
+}
+
+### 12. Update Non-existent Product
+PUT {{baseUrl}}/products/507f1f77bcf86cd799439011
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Product"
+}
+
+### 13. Delete Non-existent Product
+DELETE {{baseUrl}}/products/507f1f77bcf86cd799439011
+Authorization: Bearer {{token}}
+
+### 14. Create Product without Authentication
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "Test Product",
+  "price": 29.99,
+  "category": "Men"
+}
+
+### 15. Update Product with Invalid Sizes
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "sizes": ["XS", "XXL", "Invalid"]
+}

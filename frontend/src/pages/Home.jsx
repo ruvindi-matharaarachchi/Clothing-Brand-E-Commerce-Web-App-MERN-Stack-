@@ -198,18 +198,36 @@ const Home = () => {
         )}
 
         {/* Featured Products Grid */}
-        {!loading && !error && featuredProducts.length > 0 && (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '20px',
-            marginBottom: '40px'
-          }}>
-            {featuredProducts.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-        )}
+            {!loading && !error && featuredProducts.length > 0 && (
+              <div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '20px'
+                }}>
+                  <h2 style={{ margin: 0, color: '#333' }}>Featured Products</h2>
+                  <Link to="/products" style={{
+                    color: '#007bff',
+                    textDecoration: 'none',
+                    fontWeight: 'bold',
+                    fontSize: '14px'
+                  }}>
+                    View All Products →
+                  </Link>
+                </div>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: '20px',
+                  marginBottom: '40px'
+                }}>
+                  {featuredProducts.map((product) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
+                </div>
+              </div>
+            )}
 
         {/* No Products State */}
         {!loading && !error && featuredProducts.length === 0 && (

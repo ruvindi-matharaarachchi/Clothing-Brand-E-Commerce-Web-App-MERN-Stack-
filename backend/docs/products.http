@@ -1,0 +1,64 @@
+### Product Management API Documentation
+### Base URL: http://localhost:5000/api
+
+### 1. Get All Products (with filters, pagination, and sorting)
+GET http://localhost:5000/api/products
+
+### 2. Get Products with Search
+GET http://localhost:5000/api/products?search=shirt
+
+### 3. Get Products by Category
+GET http://localhost:5000/api/products?category=Men
+
+### 4. Get Products by Size
+GET http://localhost:5000/api/products?size=M
+
+### 5. Get Products by Price Range
+GET http://localhost:5000/api/products?priceMin=50&priceMax=100
+
+### 6. Get Products with Pagination
+GET http://localhost:5000/api/products?page=1&limit=5
+
+### 7. Get Products with Sorting
+GET http://localhost:5000/api/products?sort=price:asc
+
+### 8. Get Products with Multiple Filters
+GET http://localhost:5000/api/products?search=shirt&category=Men&size=M&priceMin=20&priceMax=100&page=1&limit=10&sort=price:asc
+
+### 9. Get Products by Category and Size
+GET http://localhost:5000/api/products?category=Women&size=L
+
+### 10. Get Products with Price Range and Sorting
+GET http://localhost:5000/api/products?priceMin=30&priceMax=80&sort=name:asc
+
+### 11. Get Single Product by ID (replace with actual ID)
+GET http://localhost:5000/api/products/66f9a7f0f1c2b8b3f9e12345
+
+### 12. Test Invalid Product ID (should return 400)
+GET http://localhost:5000/api/products/invalid-id
+
+### 13. Test Non-existent Product ID (should return 404)
+GET http://localhost:5000/api/products/507f1f77bcf86cd799439011
+
+### Example Response Format:
+# {
+#   "data": [
+#     {
+#       "_id": "66f9a7f0f1c2b8b3f9e12345",
+#       "name": "Classic White T-Shirt",
+#       "description": "Comfortable 100% cotton t-shirt...",
+#       "price": 29.99,
+#       "imageUrl": "https://via.placeholder.com/300x300?text=White+T-Shirt",
+#       "category": "Men",
+#       "sizes": ["S", "M", "L", "XL"],
+#       "createdAt": "2024-01-15T10:30:00.000Z",
+#       "updatedAt": "2024-01-15T10:30:00.000Z"
+#     }
+#   ],
+#   "page": 1,
+#   "pages": 5,
+#   "total": 24,
+#   "limit": 10,
+#   "hasPrev": false,
+#   "hasNext": true
+# }

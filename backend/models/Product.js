@@ -4,13 +4,11 @@ const productSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Please add a product name'],
-    trim: true,
-    index: true
+    trim: true
   },
   description: {
     type: String,
-    required: false,
-    index: true
+    default: ''
   },
   price: {
     type: Number,
@@ -19,22 +17,26 @@ const productSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    required: false
+    default: ''
   },
   category: {
     type: String,
     required: [true, 'Please add a category'],
-    enum: ['Men', 'Women', 'Kids']
+    enum: ['Men', 'Women', 'Kids'],
+    index: true
   },
   sizes: {
     type: [String],
     enum: ['S', 'M', 'L', 'XL'],
     default: ['S', 'M', 'L', 'XL']
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
   }
+}, {
+  timestamps: true
 });
+
+// Indexes for search and filtering
+productSchema.index({ name: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ name: 'text', description: 'text' });
 
 module.exports = mongoose.model('Product', productSchema);

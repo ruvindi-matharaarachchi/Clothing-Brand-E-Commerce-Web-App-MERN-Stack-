@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Home from './pages/Home';
+import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -35,6 +36,7 @@ const Layout = ({ children }) => (
         </Link>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <Link to="/" style={{ textDecoration: 'none', color: '#333' }}>Home</Link>
+          <Link to="/products" style={{ textDecoration: 'none', color: '#333' }}>Products</Link>
           <Link to="/cart" style={{ textDecoration: 'none', color: '#333' }}>Cart</Link>
           <Link to="/orders" style={{ textDecoration: 'none', color: '#333' }}>Orders</Link>
           <Link to="/login" style={{ textDecoration: 'none', color: '#333' }}>Login</Link>
@@ -64,6 +66,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout><Home /></Layout>,
+  },
+  {
+    path: "/products",
+    element: <Layout><Products /></Layout>,
   },
   {
     path: "/product/:id",

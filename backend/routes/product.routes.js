@@ -4,7 +4,7 @@ const { getProducts, getProductById } = require('../controllers/product.controll
 const router = express.Router();
 
 // @route   GET /api/products
-// @desc    Get all products with filtering and pagination
+// @desc    Get all products with filtering, pagination, and sorting
 // @access  Public
 router.get('/', getProducts);
 

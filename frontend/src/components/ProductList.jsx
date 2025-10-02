@@ -61,7 +61,7 @@ const ProductList = () => {
   // Load products on component mount and when filters change
   useEffect(() => {
     loadProducts(1, filters);
-  }, [filters]);
+  }, [filters, loadProducts]);
 
   // Handle filter changes
   const handleFiltersChange = (newFilters) => {

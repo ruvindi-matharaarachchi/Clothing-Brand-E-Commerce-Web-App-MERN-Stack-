@@ -125,18 +125,7 @@ A full-stack e-commerce application built with MongoDB, Express.js, React, and N
    cp env.example .env
    ```
    
-   Edit `.env` file:
-   ```env
-   PORT=5000
-   MONGO_URI=mongodb://127.0.0.1:27017/clothing_ecommerce
-   JWT_SECRET=your_super_secret_jwt_key_here
-   SMTP_HOST=smtp.gmail.com
-   SMTP_PORT=587
-   SMTP_USER=your_email@gmail.com
-   SMTP_PASS=your_app_password
-   MAIL_FROM="No Reply <no-reply@yourstore.com>"
-   CLIENT_URL=http://localhost:3000
-   ```
+   
 
    **Frontend (.env)**
    ```bash

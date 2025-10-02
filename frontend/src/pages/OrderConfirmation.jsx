@@ -1,9 +1,8 @@
 import React from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 
 const OrderConfirmation = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const order = location.state?.order;
 
   // If no order data, show fallback
